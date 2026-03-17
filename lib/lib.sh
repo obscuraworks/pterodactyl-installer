@@ -540,6 +540,7 @@ case "$OS" in
 ubuntu)
   [ "$OS_VER_MAJOR" == "22" ] && SUPPORTED=true
   [ "$OS_VER_MAJOR" == "24" ] && SUPPORTED=true
+  [ "$OS_VER_MAJOR" == "25" ] && SUPPORTED=true # Just for debugging
   export DEBIAN_FRONTEND=noninteractive
   ;;
 debian)
