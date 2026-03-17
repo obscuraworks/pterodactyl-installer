@@ -42,8 +42,12 @@ if ! [ -x "$(command -v curl)" ]; then
 fi
 
 # Always remove lib.sh, before downloading it
+# Tambahkan baris echo ini buat debug
+echo "DEBUG: URL yang dipanggil adalah -> $GITHUB_BASE_URL/master/lib/lib.sh"
+
 [ -f /tmp/lib.sh ] && rm -rf /tmp/lib.sh
 curl -sSL -o /tmp/lib.sh "$GITHUB_BASE_URL"/master/lib/lib.sh
+
 # shellcheck source=lib/lib.sh
 source /tmp/lib.sh
 
