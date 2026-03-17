@@ -235,18 +235,19 @@ ubuntu_dep() {
   # Install deps untuk nambah repo
   install_packages "software-properties-common apt-transport-https ca-certificates gnupg"
 
-  # Tambahkan Ubuntu universe repo
+  # Add Ubuntu universe repo
   add-apt-repository universe -y
 
-  # Cek: Jika Ubuntu >= 24, PHP 8.3 sudah ada di repo utama.
-  # Jika di bawah 24 (misal 22.04), baru butuh PPA.
+  # PHP 8.3 sudah ada di repo official Ubuntu 24.04 dan 25.04
+  # Kita cuma butuh PPA kalau versinya DI BAWAH 24 (kayak 22.04)
   if [ "$OS_VER_MAJOR" -lt "24" ]; then
-    output "Menambahkan PPA PHP untuk Ubuntu versi lama..."
+    output "Versi lama terdeteksi, menambahkan PPA Ondrej untuk PHP 8.3..."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
   else
-    output "Ubuntu $OS_VER terdeteksi. Menggunakan PHP dari repository resmi (PPA dilewati)."
+    output "Ubuntu 24/25 terdeteksi. Menggunakan PHP 8.3 dari repository resmi (PPA dilewati)."
   fi
 }
+
 
 
 
