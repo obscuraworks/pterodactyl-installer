@@ -28,7 +28,7 @@ set -e
 #                                                                                    #
 ######################################################################################
 
-export GITHUB_SOURCE="v1.2.0"
+export GITHUB_SOURCE="master"
 export SCRIPT_RELEASE="v1.2.0"
 export GITHUB_BASE_URL="https://raw.githubusercontent.com/obscuraworks/pterodactyl-installer"
 
