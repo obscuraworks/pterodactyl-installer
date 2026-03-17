@@ -238,15 +238,16 @@ ubuntu_dep() {
   # Tambahkan Ubuntu universe repo
   add-apt-repository universe -y
 
-  # PHP 8.3 udah ada di repo resmi Ubuntu 24.04 dan 25.04
-  # Kita cuma butuh PPA kalau versinya di bawah 24 (seperti 22.04)
+  # Cek: Jika Ubuntu >= 24, PHP 8.3 sudah ada di repo utama.
+  # Jika di bawah 24 (misal 22.04), baru butuh PPA.
   if [ "$OS_VER_MAJOR" -lt "24" ]; then
     output "Menambahkan PPA PHP untuk Ubuntu versi lama..."
     LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
   else
-    output "Ubuntu 24/25 terdeteksi, menggunakan PHP dari repo official."
+    output "Ubuntu $OS_VER terdeteksi. Menggunakan PHP dari repository resmi (PPA dilewati)."
   fi
 }
+
 
 
 debian_dep() {
