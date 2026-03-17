@@ -232,15 +232,22 @@ php_fpm_conf() {
 }
 
 ubuntu_dep() {
-  # Install deps for adding repos
+  # Install deps untuk nambah repo
   install_packages "software-properties-common apt-transport-https ca-certificates gnupg"
 
-  # Add Ubuntu universe repo
+  # Tambahkan Ubuntu universe repo
   add-apt-repository universe -y
 
-  # Add PPA for PHP (we need 8.3)
-  LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+  # PHP 8.3 udah ada di repo resmi Ubuntu 24.04 dan 25.04
+  # Kita cuma butuh PPA kalau versinya di bawah 24 (seperti 22.04)
+  if [ "$OS_VER_MAJOR" -lt "24" ]; then
+    output "Menambahkan PPA PHP untuk Ubuntu versi lama..."
+    LC_ALL=C.UTF-8 add-apt-repository -y ppa:ondrej/php
+  else
+    output "Ubuntu 24/25 terdeteksi, menggunakan PHP dari repo official."
+  fi
 }
+
 
 debian_dep() {
   # Install deps for adding repos
