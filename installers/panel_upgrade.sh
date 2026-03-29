@@ -109,6 +109,7 @@ perform_upgrade() {
   php artisan down >/dev/null 2>&1
 
   show_upgrade_progress 20 "Downloading latest Obscuraworks panel release..."
+  rm -rf "$PANEL_DIR/resources/scripts"
   curl -sSL "$PANEL_DL_URL" | tar -xzv >/dev/null 2>&1
   chmod -R 755 storage/* bootstrap/cache/
 
