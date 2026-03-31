@@ -56,9 +56,6 @@ DIM='\033[2m'
 AMBER='\033[38;5;214m'
 AMBER_B='\033[1;38;5;214m'
 
-# Dark gold — secondary accent
-GOLD='\033[38;5;178m'
-
 # Neutral grays
 GRAY='\033[38;5;240m'
 LGRAY='\033[38;5;248m'
@@ -67,21 +64,22 @@ LGRAY='\033[38;5;248m'
 GREEN='\033[38;5;78m'
 RED='\033[38;5;203m'
 BLUE='\033[38;5;111m'
-CYAN='\033[38;5;87m'
 
 # ─────────────────────────────────────────────
 # HEADER
 # ─────────────────────────────────────────────
 _upgrade_print_header() {
   local W=70
-  local top="╔$(printf '═%.0s' $(seq 1 $((W-2))))╗"
-  local bot="╚$(printf '═%.0s' $(seq 1 $((W-2))))╝"
-  local mid="║$(printf ' %.0s' $(seq 1 $((W-2))))║"
+  local top bot mid
+
+  top="╔$(printf '═%.0s' $(seq 1 $((W-2))))╗"
+  bot="╚$(printf '═%.0s' $(seq 1 $((W-2))))╝"
+  mid="║$(printf ' %.0s' $(seq 1 $((W-2))))║"
 
   echo -e "${AMBER}${top}${RST}"
   echo -e "${AMBER}${mid}${RST}"
-  printf "${AMBER}║${RST}  ${AMBER_B}◈  OBSCURAWORKS PANEL UPGRADE${RST}$(printf ' %.0s' $(seq 1 $((W-33))))${AMBER}║${RST}\n"
-  printf "${AMBER}║${RST}  ${DIM}${LGRAY}hello@obscuraworks.com  ·  www.obscuraworks.org${RST}$(printf ' %.0s' $(seq 1 $((W-51))))${AMBER}║${RST}\n"
+  printf '%b' "${AMBER}║${RST}  ${AMBER_B}◈  OBSCURAWORKS PANEL UPGRADE${RST}$(printf ' %.0s' $(seq 1 $((W-33))))${AMBER}║${RST}\n"
+  printf '%b' "${AMBER}║${RST}  ${DIM}${LGRAY}hello@obscuraworks.com  ·  www.obscuraworks.org${RST}$(printf ' %.0s' $(seq 1 $((W-51))))${AMBER}║${RST}\n"
   echo -e "${AMBER}${mid}${RST}"
   echo -e "${AMBER}${bot}${RST}"
   echo ""
