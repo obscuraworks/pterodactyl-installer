@@ -119,14 +119,14 @@ show_upgrade_progress() {
   _upgrade_print_header
 
   echo -e "  ${LGRAY}${DIM}PROGRESS${RST}"
-  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo -e "  ${GRAY}───────────────────────────────────────────────────${RST}"
   echo ""
   printf "  ${bar_color}${BOLD}%s%s${RST}  ${AMBER_B}%3d%%${RST}\n" "$filled_bar" "$empty_bar" "$percent"
   echo ""
   echo -e "  ${step_icon}  ${LGRAY}${message}${RST}"
   echo ""
-  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
-  echo -e "  ${DIM}${GRAY}PT Obscuraworks Digital Indonesia  ·  Upgrade Engine v2${RST}"
+  echo -e "  ${GRAY}───────────────────────────────────────────────────${RST}"
+  echo -e "  ${DIM}${GRAY}Pterodactyl Installer  ·  github.com/obscuraworks/pterodactyl-installer${RST}"
 
   sleep 1
 }
@@ -190,10 +190,10 @@ perform_upgrade() {
 
   echo -e "  ${GREEN}${BOLD}✔  Upgrade completed successfully.${RST}"
   echo ""
-  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo -e "  ${GRAY}─────────────────────────────────────────────────${RST}"
   echo -e "  ${LGRAY}Your panel is back online and fully operational.${RST}"
   echo -e "  ${DIM}${GRAY}Your .env configuration and database have not been modified.${RST}"
-  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo -e "  ${GRAY}─────────────────────────────────────────────────${RST}"
   echo ""
   echo -e "  ${DIM}${GRAY}Need help? → hello@obscuraworks.com${RST}"
   echo ""
