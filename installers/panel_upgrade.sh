@@ -45,66 +45,107 @@ if ! fn_exists lib_loaded; then
   ! fn_exists lib_loaded && echo "* ERROR: Could not load lib script" && exit 1
 fi
 
-# ------------------ Progress bar -------------- #
+# ─────────────────────────────────────────────
+# COLOR PALETTE
+# ─────────────────────────────────────────────
+RST='\033[0m'
+BOLD='\033[1m'
+DIM='\033[2m'
 
-# Internal: print the header block used in progress display
+# Amber — primary brand accent
+AMBER='\033[38;5;214m'
+AMBER_B='\033[1;38;5;214m'
+
+# Dark gold — secondary accent
+GOLD='\033[38;5;178m'
+
+# Neutral grays
+GRAY='\033[38;5;240m'
+LGRAY='\033[38;5;248m'
+
+# Status colors
+GREEN='\033[38;5;78m'
+RED='\033[38;5;203m'
+BLUE='\033[38;5;111m'
+CYAN='\033[38;5;87m'
+
+# ─────────────────────────────────────────────
+# HEADER
+# ─────────────────────────────────────────────
 _upgrade_print_header() {
-  echo -e "\033[1;33m######################################################################\033[0m"
-  echo -e "\033[1;33m#     Obscuraworks Panel Upgrade                                     #\033[0m"
-  echo -e "\033[1;33m#     hello@obscuraworks.com | www.obscuraworks.org                  #\033[0m"
-  echo -e "\033[1;33m######################################################################\033[0m"
+  local W=70
+  local top="╔$(printf '═%.0s' $(seq 1 $((W-2))))╗"
+  local bot="╚$(printf '═%.0s' $(seq 1 $((W-2))))╝"
+  local mid="║$(printf ' %.0s' $(seq 1 $((W-2))))║"
+
+  echo -e "${AMBER}${top}${RST}"
+  echo -e "${AMBER}${mid}${RST}"
+  printf "${AMBER}║${RST}  ${AMBER_B}◈  OBSCURAWORKS PANEL UPGRADE${RST}$(printf ' %.0s' $(seq 1 $((W-33))))${AMBER}║${RST}\n"
+  printf "${AMBER}║${RST}  ${DIM}${LGRAY}hello@obscuraworks.com  ·  www.obscuraworks.org${RST}$(printf ' %.0s' $(seq 1 $((W-51))))${AMBER}║${RST}\n"
+  echo -e "${AMBER}${mid}${RST}"
+  echo -e "${AMBER}${bot}${RST}"
   echo ""
 }
 
+# ─────────────────────────────────────────────
+# PROGRESS BAR
+# ─────────────────────────────────────────────
 show_upgrade_progress() {
   local percent=$1
   local message=$2
 
-  local color_reset='\033[0m'
-  local color_red='\033[0;31m'
-  local color_orange='\033[0;33m'
-  local color_green='\033[0;32m'
-  local color_cyan='\033[0;36m'
-  local color_purple='\033[0;35m'
-  local color_bold='\033[1m'
+  # Bar sizing
+  local bar_width=50
+  local filled_len=$(( percent * bar_width / 100 ))
+  local empty_len=$(( bar_width - filled_len ))
 
-  local color
-  if [ "$percent" -le 40 ]; then
-    color=$color_red
-  elif [ "$percent" -le 70 ]; then
-    color=$color_orange
-  else
-    color=$color_green
-  fi
-
-  local filled_len=$((percent / 2))
-  local empty_len=$((50 - filled_len))
-  local filled_bar
-  local empty_bar
+  local filled_bar empty_bar
   filled_bar=$(printf "%${filled_len}s" | tr ' ' '█')
   empty_bar=$(printf "%${empty_len}s" | tr ' ' '░')
 
+  # Dynamic bar color based on progress
+  local bar_color
+  if [ "$percent" -le 30 ]; then
+    bar_color=$BLUE
+  elif [ "$percent" -le 70 ]; then
+    bar_color=$AMBER
+  else
+    bar_color=$GREEN
+  fi
+
+  # Step indicator
+  local step_icon="○"
+  [ "$percent" -ge 100 ] && step_icon="●"
+
   clear
   _upgrade_print_header
-  echo -e "${color_cyan}${color_bold}⚙️  Upgrade in progress...${color_reset}"
-  echo -e "${color_purple}-----------------------------------------------------${color_reset}"
-  echo -e "${color_bold}${message}${color_reset}"
-  echo -e "${color}${filled_bar}${empty_bar}${color_reset} ${color_bold}${percent}%${color_reset}"
-  echo -e "${color_purple}-----------------------------------------------------${color_reset}"
+
+  echo -e "  ${LGRAY}${DIM}PROGRESS${RST}"
+  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo ""
+  printf "  ${bar_color}${BOLD}%s%s${RST}  ${AMBER_B}%3d%%${RST}\n" "$filled_bar" "$empty_bar" "$percent"
+  echo ""
+  echo -e "  ${step_icon}  ${LGRAY}${message}${RST}"
+  echo ""
+  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo -e "  ${DIM}${GRAY}PT Obscuraworks Digital Indonesia  ·  Upgrade Engine v2${RST}"
+
   sleep 1
 }
 
-# ------------------ Upgrade function ---------- #
-
+# ─────────────────────────────────────────────
+# UPGRADE LOGIC
+# ─────────────────────────────────────────────
 perform_upgrade() {
   PANEL_DIR="/var/www/pterodactyl"
 
   if [ ! -d "$PANEL_DIR" ]; then
-    error "Panel directory $PANEL_DIR not found. Cannot perform upgrade."
+    echo -e "\n  ${RED}${BOLD}✖  ERROR:${RST} Panel directory ${BOLD}${PANEL_DIR}${RST} not found."
+    echo -e "  ${GRAY}Cannot perform upgrade. Aborting.${RST}\n"
     exit 1
   fi
 
-  show_upgrade_progress 5 "Entering panel directory and enabling maintenance mode..."
+  show_upgrade_progress 5  "Enabling maintenance mode..."
   cd "$PANEL_DIR" || exit 1
   php artisan down >/dev/null 2>&1
 
@@ -113,7 +154,7 @@ perform_upgrade() {
   curl -sSL "$PANEL_DL_URL" | tar -xzv >/dev/null 2>&1
   chmod -R 755 storage/* bootstrap/cache/
 
-  show_upgrade_progress 40 "Installing Composer dependencies (optimized, no-dev)..."
+  show_upgrade_progress 40 "Installing Composer dependencies (no-dev, optimized)..."
   [ "$OS" == "rocky" ] || [ "$OS" == "almalinux" ] && export PATH=/usr/local/bin:$PATH
   COMPOSER_ALLOW_SUPERUSER=1 composer install --no-dev --optimize-autoloader --no-interaction >/dev/null 2>&1
 
@@ -124,17 +165,13 @@ perform_upgrade() {
   show_upgrade_progress 70 "Running database migrations..."
   php artisan migrate --seed --force >/dev/null 2>&1
 
-  show_upgrade_progress 85 "Setting folder permissions..."
+  show_upgrade_progress 85 "Setting folder ownership and permissions..."
   case "$OS" in
-  debian | ubuntu)
-    chown -R www-data:www-data "$PANEL_DIR"
-    ;;
-  rocky | almalinux)
-    chown -R nginx:nginx "$PANEL_DIR"
-    ;;
+  debian | ubuntu) chown -R www-data:www-data "$PANEL_DIR" ;;
+  rocky | almalinux) chown -R nginx:nginx "$PANEL_DIR" ;;
   esac
 
-  show_upgrade_progress 92 "Clearing application cache and restarting PHP-FPM..."
+  show_upgrade_progress 92 "Clearing application cache — restarting PHP-FPM..."
   case "$OS" in
   debian | ubuntu)
     sudo -u www-data php artisan optimize:clear >/dev/null 2>&1
@@ -149,15 +186,22 @@ perform_upgrade() {
   show_upgrade_progress 100 "Bringing panel back online..."
   php artisan up >/dev/null 2>&1
 
+  # ── Success Screen ──────────────────────────────────────
   clear
   _upgrade_print_header
-  echo -e "\033[0;32m\033[1m✅  Obscuraworks Panel upgrade completed successfully!\033[0m"
+
+  echo -e "  ${GREEN}${BOLD}✔  Upgrade completed successfully.${RST}"
   echo ""
-  output "Your panel is back online."
-  output "Your .env configuration and database have not been modified."
+  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo -e "  ${LGRAY}Your panel is back online and fully operational.${RST}"
+  echo -e "  ${DIM}${GRAY}Your .env configuration and database have not been modified.${RST}"
+  echo -e "  ${GRAY}──────────────────────────────────────────────────────${RST}"
+  echo ""
+  echo -e "  ${DIM}${GRAY}Need help? → hello@obscuraworks.com${RST}"
   echo ""
 }
 
-# ------------------- Run ------------------- #
-
+# ─────────────────────────────────────────────
+# ENTRYPOINT
+# ─────────────────────────────────────────────
 perform_upgrade
