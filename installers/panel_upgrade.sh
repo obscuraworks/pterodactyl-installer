@@ -163,6 +163,12 @@ perform_upgrade() {
   show_upgrade_progress 70 "Running database migrations..."
   php artisan migrate --seed --force >/dev/null 2>&1
 
+  show_upgrade_progress 80 "Ensuring storage symlinks and media directories..."
+  rm -rf public/storage
+  php artisan storage:link >/dev/null 2>&1
+  mkdir -p storage/app/public/music
+  chmod -R 755 storage/app/public/music
+
   show_upgrade_progress 85 "Setting folder ownership and permissions..."
   case "$OS" in
   debian | ubuntu) chown -R www-data:www-data "$PANEL_DIR" ;;
@@ -198,6 +204,7 @@ perform_upgrade() {
   echo -e "  ${DIM}${GRAY}Need help? → hello@obscuraworks.com${RST}"
   echo ""
 }
+
 
 # ─────────────────────────────────────────────
 # ENTRYPOINT
