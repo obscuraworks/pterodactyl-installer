@@ -104,8 +104,13 @@ ptdl_dl() {
 
   curl -Lo panel.tar.gz "$PANEL_DL_URL"
   tar -xzvf panel.tar.gz
-  chmod -R 755 storage/* bootstrap/cache/
 
+  rm -rf public/storage
+  php artisan storage:link >/dev/null 2>&1
+  mkdir -p storage/app/public/music
+  chmod -R 755 storage/app/public/music
+
+  chmod -R 755 storage/* bootstrap/cache/
   cp .env.example .env
 
   success "Downloaded pterodactyl panel files!"
