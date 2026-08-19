@@ -132,6 +132,67 @@ show_upgrade_progress() {
 }
 
 # ─────────────────────────────────────────────
+# YT-DLP SETUP
+# ─────────────────────────────────────────────
+setup_ytdlp() {
+  echo ""
+  echo -e "  ${AMBER_B}◈  Setting up yt-dlp...${RST}"
+  echo ""
+
+  # Install FFmpeg
+  if command -v ffmpeg >/dev/null 2>&1; then
+    echo -e "  ${GREEN}✔${RST} FFmpeg already installed."
+  else
+    echo -e "  ${BLUE}→${RST} Installing FFmpeg..."
+
+    case "$OS" in
+      debian | ubuntu)
+        apt-get update -y >/dev/null 2>&1
+        apt-get install -y ffmpeg >/dev/null 2>&1
+        ;;
+      rocky | almalinux)
+        dnf install -y epel-release >/dev/null 2>&1 || true
+        dnf install -y ffmpeg >/dev/null 2>&1
+        ;;
+      *)
+        echo -e "  ${RED}✖${RST} Unsupported OS for automatic FFmpeg installation."
+        return 1
+        ;;
+    esac
+
+    echo -e "  ${GREEN}✔${RST} FFmpeg installed."
+  fi
+
+  # Install / update yt-dlp
+  echo -e "  ${BLUE}→${RST} Installing latest yt-dlp..."
+
+  local YTDLP_BIN="/usr/local/bin/yt-dlp"
+
+  curl -L \
+    "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp" \
+    -o "$YTDLP_BIN" \
+    --silent \
+    --show-error
+
+  chmod 755 "$YTDLP_BIN"
+
+  # Verify
+  if command -v yt-dlp >/dev/null 2>&1; then
+    local YTDLP_VERSION
+    YTDLP_VERSION=$(yt-dlp --version)
+
+    echo -e "  ${GREEN}✔${RST} yt-dlp installed successfully."
+    echo -e "  ${GRAY}Version:${RST} ${LGRAY}${YTDLP_VERSION}${RST}"
+    echo -e "  ${GRAY}Binary:${RST}  ${LGRAY}${YTDLP_BIN}${RST}"
+  else
+    echo -e "  ${RED}✖${RST} Failed to install yt-dlp."
+    return 1
+  fi
+
+  echo ""
+}
+
+# ─────────────────────────────────────────────
 # UPGRADE LOGIC
 # ─────────────────────────────────────────────
 perform_upgrade() {
@@ -174,6 +235,9 @@ perform_upgrade() {
   debian | ubuntu) chown -R www-data:www-data "$PANEL_DIR" ;;
   rocky | almalinux) chown -R nginx:nginx "$PANEL_DIR" ;;
   esac
+
+  show_upgrade_progress 88 "Setting up yt-dlp and FFmpeg..."
+  setup_ytdlp
 
   show_upgrade_progress 92 "Clearing application cache — restarting PHP-FPM..."
   case "$OS" in
